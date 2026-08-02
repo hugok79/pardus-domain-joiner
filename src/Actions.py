@@ -4,6 +4,7 @@ import sys
 import signal
 import os
 from pardus_domain_joiner import domain_operations
+import psutil
 
 if len(sys.argv) >= 2:
     cmd = sys.argv[1]
@@ -62,5 +63,28 @@ if len(sys.argv) >= 2:
 
     elif cmd == "cancel":
         pid = int(sys.argv[2])
+        current_uid = os.getuid() # UID of the user executing the command
 
-        os.kill(pid, signal.SIGKILL)
+        try:
+            process = psutil.Process(pid)
+            process_uid = process.uids().real  # UID of the target process owner
+
+            # Block if the executing user is NOT 'root' AND is NOT the process owner
+            if current_uid != 0 and current_uid != process_uid:
+                print("Error: You cannot terminate a process belonging to another user!")
+                sys.exit(1)
+
+            # Verify if the process belongs to this application
+            cmdline = " ".join(process.cmdline())
+            if "pardus-domain-joiner" not in cmdline:
+                print("The specified PID is not associated with this application!")
+                sys.exit(1)
+
+            # Graceful termination
+            process.terminate()
+            print("Process has been successfully terminated.")
+
+        except psutil.NoSuchProcess:
+            print("Specified PID not found.")
+        except psutil.AccessDenied:
+            print("Access denied for this process.")
