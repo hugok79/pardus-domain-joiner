@@ -1,3 +1,11 @@
+pardus-domain-joiner (0.5.5) yirmiuc; urgency=medium
+
+  [ Büşra ÇAĞLIYAN ]
+  * fix(security): prevent unauthorized process termination by non-root users PARDUS-1749
+  * fix(debian): add missing python3-psutil dependency PARDUS-1749
+
+ -- Fatih Altun <fatih.altun@pardus.org.tr>  Wed, 05 Aug 2026 16:46:47 +0300
+
 pardus-domain-joiner (0.5.4) yirmiuc; urgency=medium
 
   * fix(ui): add null check for last_step_box and escape markup characters
